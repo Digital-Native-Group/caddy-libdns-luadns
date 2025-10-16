@@ -128,13 +128,13 @@ example.com {
 To compile Caddy with this module:
 
 ```bash
-xcaddy build --with github.com/caddy-dns/luadns
+xcaddy build --with github.com/digital-native-group/caddy-libdns-luadns
 ```
 
 Or to build locally during development:
 
 ```bash
-xcaddy build --with github.com/caddy-dns/luadns=./
+xcaddy build --with github.com/digital-native-group/caddy-libdns-luadns=./
 ```
 
 ## Development Notes
@@ -160,7 +160,7 @@ When ready to publish:
    - Remove the `replace` directive from `go.mod`
    - Run `go get github.com/libdns/luadns@latest`
    - Update `go.mod` to reference the published version
-   - Update repository URL to `github.com/caddy-dns/luadns`
+   - Update repository URL to `github.com/digital-native-group/caddy-libdns-luadns`
 
 3. **Finalize documentation**:
    - Update LICENSE with your name and current year
@@ -178,7 +178,7 @@ To test the module with actual Lua DNS credentials:
 
 ```bash
 # Build Caddy with the module
-xcaddy build --with github.com/caddy-dns/luadns=./
+xcaddy build --with github.com/digital-native-group/caddy-libdns-luadns=./
 
 # Create a Caddyfile for testing
 cat > Caddyfile <<EOF
