@@ -3,7 +3,7 @@ package luadns
 import (
 	"github.com/caddyserver/caddy/v2"
 	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
-	"github.com/libdns/luadns"
+	luadns "github.com/digital-native-group/caddy-libdns-luadns/libdns-luadns"
 )
 
 // Provider lets Caddy read and manipulate DNS records hosted by Lua DNS.

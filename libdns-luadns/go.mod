@@ -1,4 +1,4 @@
-module github.com/libdns/luadns
+module github.com/digital-native-group/caddy-libdns-luadns/libdns-luadns
 
 go 1.21
 

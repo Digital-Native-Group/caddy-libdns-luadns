@@ -6,7 +6,7 @@ toolchain go1.24.8
 
 require (
 	github.com/caddyserver/caddy/v2 v2.8.4
-	github.com/libdns/luadns v0.0.0
+	github.com/digital-native-group/caddy-libdns-luadns/libdns-luadns v0.0.0
 )
 
 require (
@@ -47,4 +47,4 @@ require (
 )
 
 // For local development - remove this when publishing
-replace github.com/libdns/luadns => ./libdns-luadns
+replace github.com/digital-native-group/caddy-libdns-luadns/libdns-luadns => ./libdns-luadns

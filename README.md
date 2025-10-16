@@ -45,17 +45,17 @@ The Caddy module wrapper that connects libdns to Caddy's configuration system:
 ### Project Structure
 ```
 .
-├── libdns-luadns/          # libdns provider (can be published to github.com/libdns/luadns)
+├── libdns-luadns/          # libdns provider (submodule, can be migrated to github.com/libdns/luadns)
 │   ├── provider.go         # libdns interface implementation
 │   ├── client.go           # HTTP client for Lua DNS API
-│   ├── go.mod              # Independent module definition
+│   ├── go.mod              # Module: github.com/digital-native-group/caddy-libdns-luadns/libdns-luadns
 │   └── README.md           # Provider-specific documentation
 ├── module.go               # Caddy module integration
-├── go.mod                  # Caddy module (uses replace directive for local dev)
+├── go.mod                  # Main module: github.com/digital-native-group/caddy-libdns-luadns
 └── README.md               # This file
 ```
 
-The implementation follows Caddy ecosystem best practices and can be split into two separate repositories when ready for publication.
+The implementation uses a submodule structure that works with Docker builds and can be migrated to the official libdns organization when ready.
 
 ## Caddy module name
 
@@ -143,24 +143,24 @@ xcaddy build --with github.com/digital-native-group/caddy-libdns-luadns=./
 The project currently uses a Go module `replace` directive to reference the local `libdns-luadns` directory:
 
 ```go
-replace github.com/libdns/luadns => ./libdns-luadns
+replace github.com/digital-native-group/caddy-libdns-luadns/libdns-luadns => ./libdns-luadns
 ```
 
-This allows for integrated development and testing before splitting into separate repositories.
+This allows for integrated development and testing. The libdns provider is structured as a submodule that can later be migrated to the official `github.com/libdns/luadns` repository.
 
 ### Publishing Checklist
 When ready to publish:
 
-1. **Publish libdns provider first**:
-   - Move `libdns-luadns/` to a new repository at `github.com/libdns/luadns`
+1. **Publish libdns provider** (optional - if contributing to libdns ecosystem):
+   - Fork or create repository at `github.com/libdns/luadns`
+   - Update module path in `libdns-luadns/go.mod` from `github.com/digital-native-group/caddy-libdns-luadns/libdns-luadns` to `github.com/libdns/luadns`
    - Tag with semantic version (e.g., `v1.0.0`)
-   - Update the module path in `libdns-luadns/go.mod` if needed
 
-2. **Update Caddy module**:
+2. **Update Caddy module** (if migrating to official libdns):
+   - Update import in `module.go` from `github.com/digital-native-group/caddy-libdns-luadns/libdns-luadns` to `github.com/libdns/luadns`
+   - Update `go.mod` to require `github.com/libdns/luadns` instead
    - Remove the `replace` directive from `go.mod`
    - Run `go get github.com/libdns/luadns@latest`
-   - Update `go.mod` to reference the published version
-   - Update repository URL to `github.com/digital-native-group/caddy-libdns-luadns`
 
 3. **Finalize documentation**:
    - Update LICENSE with your name and current year
