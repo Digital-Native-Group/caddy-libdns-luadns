@@ -69,7 +69,7 @@ func (p *Provider) AppendRecords(ctx context.Context, zone string, records []lib
 
 		createdRec, err := p.client.CreateRecord(ctx, zoneID, apiRec)
 		if err != nil {
-			return created, fmt.Errorf("failed to create record %s: %w", rec.Name, err)
+			return created, fmt.Errorf("failed to create record %s: %w", rec.RR().Name, err)
 		}
 
 		created = append(created, toLibdnsRecord(createdRec, zone))
@@ -113,14 +113,14 @@ func (p *Provider) SetRecords(ctx context.Context, zone string, records []libdns
 			// Update existing record
 			updatedRec, err := p.client.UpdateRecord(ctx, zoneID, existingID, apiRec)
 			if err != nil {
-				return updated, fmt.Errorf("failed to update record %s: %w", rec.Name, err)
+				return updated, fmt.Errorf("failed to update record %s: %w", rec.RR().Name, err)
 			}
 			updated = append(updated, toLibdnsRecord(updatedRec, zone))
 		} else {
 			// Create new record
 			createdRec, err := p.client.CreateRecord(ctx, zoneID, apiRec)
 			if err != nil {
-				return updated, fmt.Errorf("failed to create record %s: %w", rec.Name, err)
+				return updated, fmt.Errorf("failed to create record %s: %w", rec.RR().Name, err)
 			}
 			updated = append(updated, toLibdnsRecord(createdRec, zone))
 		}
@@ -164,7 +164,7 @@ func (p *Provider) DeleteRecords(ctx context.Context, zone string, records []lib
 
 		err := p.client.DeleteRecord(ctx, zoneID, recordID)
 		if err != nil {
-			return deleted, fmt.Errorf("failed to delete record %s: %w", rec.Name, err)
+			return deleted, fmt.Errorf("failed to delete record %s: %w", rec.RR().Name, err)
 		}
 
 		deleted = append(deleted, rec)
@@ -238,19 +238,21 @@ func toLibdnsRecord(r Record, zone string) libdns.Record {
 	name := strings.TrimSuffix(r.Name, "."+zone)
 	name = strings.TrimSuffix(name, ".")
 
-	return libdns.Record{
-		ID:    fmt.Sprintf("%d", r.ID),
-		Type:  r.Type,
-		Name:  name,
-		Value: r.Content,
-		TTL:   time.Duration(r.TTL) * time.Second,
+	return libdns.RR{
+		Name: name,
+		TTL:  time.Duration(r.TTL) * time.Second,
+		Type: r.Type,
+		Data: r.Content,
 	}
 }
 
 // fromLibdnsRecord converts a libdns record to a Lua DNS API record
 func fromLibdnsRecord(r libdns.Record, zone string) Record {
+	// Get the underlying RR
+	rr := r.RR()
+
 	// Construct FQDN
-	name := r.Name
+	name := rr.Name
 	if name == "@" || name == "" {
 		name = zone
 	} else if !strings.HasSuffix(name, ".") {
@@ -258,15 +260,15 @@ func fromLibdnsRecord(r libdns.Record, zone string) Record {
 	}
 	name = strings.TrimSuffix(name, ".")
 
-	ttl := int(r.TTL.Seconds())
+	ttl := int(rr.TTL.Seconds())
 	if ttl == 0 {
 		ttl = 3600 // Default TTL
 	}
 
 	return Record{
 		Name:    name,
-		Type:    r.Type,
-		Content: r.Value,
+		Type:    rr.Type,
+		Content: rr.Data,
 		TTL:     ttl,
 	}
 }
