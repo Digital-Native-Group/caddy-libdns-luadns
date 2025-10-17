@@ -258,7 +258,7 @@ func fromLibdnsRecord(r libdns.Record, zone string) Record {
 	} else if !strings.HasSuffix(name, ".") {
 		name = name + "." + zone
 	}
-	name = strings.TrimSuffix(name, ".")
+	// Keep trailing dot - Lua DNS API requires fully qualified domain name format
 
 	ttl := int(rr.TTL.Seconds())
 	if ttl == 0 {
