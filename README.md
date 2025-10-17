@@ -148,6 +148,69 @@ replace github.com/digital-native-group/caddy-libdns-luadns/libdns-luadns => ./l
 
 This allows for integrated development and testing. The libdns provider is structured as a submodule that can later be migrated to the official `github.com/libdns/luadns` repository.
 
+### Versioning
+
+This project uses Git tags for version management with a nested module structure. When releasing a new version:
+
+#### For Bug Fixes or Minor Updates:
+
+1. **Update the libdns provider** (if provider code changed):
+   ```bash
+   cd /path/to/caddy-libdns-luadns
+
+   # Make your changes to libdns-luadns/
+   # Test your changes locally
+   go build ./...
+
+   # Create a new submodule version tag
+   git add libdns-luadns/
+   git commit -m "Fix: description of bug fix"
+   git tag libdns-luadns/v0.2.1  # Increment the patch version
+   git push origin main
+   git push origin libdns-luadns/v0.2.1
+   ```
+
+2. **Update the main module** to reference the new submodule version:
+   ```bash
+   # Update go.mod to reference new submodule version
+   # Edit go.mod and change:
+   # github.com/digital-native-group/caddy-libdns-luadns/libdns-luadns v0.2.0
+   # to:
+   # github.com/digital-native-group/caddy-libdns-luadns/libdns-luadns v0.2.1
+
+   go mod tidy
+   git add go.mod go.sum
+   git commit -m "Update libdns-luadns to v0.2.1"
+   git tag v0.1.1  # Increment the main module version
+   git push origin main
+   git push origin v0.1.1
+   ```
+
+3. **Update Docker builds** to use the new version:
+   ```dockerfile
+   # In Dockerfile, change:
+   RUN xcaddy build --with github.com/digital-native-group/caddy-libdns-luadns@v0.1.1
+   ```
+
+#### For Major Updates (Breaking Changes):
+
+1. Follow the same process but increment major versions:
+   - Submodule: `libdns-luadns/v1.0.0`
+   - Main module: `v1.0.0`
+
+2. Update Caddy dependency if needed:
+   ```bash
+   go get github.com/caddyserver/caddy/v2@v2.x.x
+   go mod tidy
+   ```
+
+#### Version Tag Format:
+
+- **Main module**: `v0.1.0`, `v0.2.0`, `v1.0.0`
+- **libdns submodule**: `libdns-luadns/v0.1.0`, `libdns-luadns/v0.2.0`
+
+**Important**: Once a version is published to the Go module proxy, it cannot be changed. Always create a new version for fixes or updates.
+
 ### Publishing Checklist
 When ready to publish:
 
